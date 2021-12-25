@@ -13,7 +13,7 @@ export default function Form(){
 
     //FUNÇÃO QUE CALCULA O IMC DO USUÁRIO
     function IMCCalculator(){
-        return setIMC(weight/(height*height)).toFixed(2) //Calculando o IMC do usuário
+        return setIMC((weight/(height*height)).toFixed(2)) //Calculando o IMC do usuário
     }
 
     //FUNÇÃO DE VALIDAÇÃO DO IMC
@@ -40,7 +40,7 @@ export default function Form(){
                 
                 <Text>Altura</Text>
                 <TextInput
-                    onChange = {setHeight} //quando clicar pra inserir a altura esse valor irá para a variável height
+                    onChangeText = {setHeight} //quando clicar pra inserir a altura esse valor irá para a variável height
                     value = {height} //o valor do textInput vai seu igual ao da variável height
                     placeholder = "Ex: 1.75"
                     keyboardType = "numeric"
@@ -48,16 +48,21 @@ export default function Form(){
 
                 <Text>Peso</Text>
                 <TextInput
-                    onChange = {setWeight} //quando clicar pra inserir a altura esse valor irá para a variável weight
+                    onChangeText = {setWeight} //quando clicar pra inserir a altura esse valor irá para a variável weight
                     value = {weight} //o valor do textInput vai seu igual ao da variável weight
                     placeholder = "Ex: 75.365"
                     keyboardType = "numeric"
                 />
 
-                <Button title = "Calcular IMC"/>
-
-                <ResultIMC messageresultIMC = {messageIMC} resultIMC = {IMC}/> {/* Componente que vai mostrar o resultado */}
+                <Button
+                    onPress = {() => validationIMC()} 
+                    title = {textButton}
+                />
+                
             </View>
+
+            <ResultIMC messageResultIMC = {messageIMC} resultIMC = {IMC}/>
+            
         </View>
     );
 }
