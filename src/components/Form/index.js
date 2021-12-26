@@ -1,6 +1,7 @@
 import React, {useState} from "react";
-import {View, Text, TextInput, Button} from "react-native"
+import {View, Text, TextInput, TouchableOpacity} from "react-native"
 import ResultIMC from "./ResultIMC";
+import styles from "./style";
 
 export default function Form(){
 
@@ -33,31 +34,35 @@ export default function Form(){
     }
 
     return(
-        <View>
+        <View style = {styles.FormContext}>
 
             {/* FORMULÁRIO ONDE SERÃO PREENCHIDAS AS INFORMAÇÕES DO PESO E ALTURA */}
-            <View>
+            <View style = {styles.Form}>
                 
-                <Text>Altura</Text>
+                <Text style = {styles.FormLabel}>Altura</Text>
                 <TextInput
+                    style = {styles.input}
                     onChangeText = {setHeight} //quando clicar pra inserir a altura esse valor irá para a variável height
                     value = {height} //o valor do textInput vai seu igual ao da variável height
                     placeholder = "Ex: 1.75"
                     keyboardType = "numeric"
                 />
 
-                <Text>Peso</Text>
+                <Text style = {styles.FormLabel}>Peso</Text>
                 <TextInput
+                    style = {styles.input}                   
                     onChangeText = {setWeight} //quando clicar pra inserir a altura esse valor irá para a variável weight
                     value = {weight} //o valor do textInput vai seu igual ao da variável weight
                     placeholder = "Ex: 75.365"
                     keyboardType = "numeric"
                 />
 
-                <Button
-                    onPress = {() => validationIMC()} 
-                    title = {textButton}
-                />
+                <TouchableOpacity
+                    style = {styles.buttonCalculator}
+                    onPress = {() => validationIMC()}
+                >
+                    <Text style = {styles.textButtonCalculator}>{textButton}</Text>
+                </TouchableOpacity>
                 
             </View>
 
