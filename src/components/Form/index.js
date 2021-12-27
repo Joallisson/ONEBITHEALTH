@@ -1,5 +1,13 @@
 import React, {useState} from "react";
-import {View, Text, TextInput, TouchableOpacity} from "react-native"
+import {
+    View,
+    Text, 
+    TextInput,
+    TouchableOpacity,
+    Vibration,
+    Pressable,
+    Keyboard,
+    } from "react-native"
 import ResultIMC from "./ResultIMC";
 import styles from "./style";
 
@@ -11,35 +19,51 @@ export default function Form(){
     const [messageIMC, setMessageIMC] = useState("Preencha com seu peso") //Controlar o estado da mensagem
     const [IMC, setIMC] = useState(null) //Controlar o estado do resultado do imc do usuário
     const [textButton, setTextButton] = useState("Calcular") //Controlar o estado do texto do botão da mensagem
+    const [errorMessage, setErrorMessage] = useState(null) //Mensagem de erro
 
     //FUNÇÃO QUE CALCULA O IMC DO USUÁRIO
     function IMCCalculator(){
-        return setIMC((weight/(height*height)).toFixed(2)) //Calculando o IMC do usuário
+        let heightFormat = height.replace("," , ".") //Se o usuário digitar a altura com vírgula "," essa função vair trocar por um ponto "."
+        return setIMC((weight/(heightFormat*heightFormat)).toFixed(2)) //Calculando o IMC do usuário
+    }
+
+    //VERIFICANDO SE O IMC ESTÁ VAZIO
+    function verificationIMC(){
+        if (IMC == null) {
+            Vibration.vibrate()
+            setErrorMessage("Esse campo é obrigatório*")
+        } 
     }
 
     //FUNÇÃO DE VALIDAÇÃO DO IMC
     function validationIMC(){
         if (weight != null && height != null) { //Se o peso e a altura não dorem nulos
+
             IMCCalculator()
             setHeight(null)
             setWeight(null)
             setMessageIMC("Seu IMC é igual a: ")
             setTextButton("Calcular novamente")
+            setErrorMessage(null)
+
             return
         }
         //Se o peso ou altura estiverem forem iguais a null
+        verificationIMC()
         setIMC(null)
         setTextButton("Calcular")
         setMessageIMC("Preencha o peso e a altura")
+        
     }
 
     return(
-        <View style = {styles.FormContext}>
+        <Pressable onPress = {Keyboard.dismiss} style = {styles.FormContext}>
 
             {/* FORMULÁRIO ONDE SERÃO PREENCHIDAS AS INFORMAÇÕES DO PESO E ALTURA */}
             <View style = {styles.Form}>
                 
                 <Text style = {styles.FormLabel}>Altura</Text>
+                <Text style = {styles.errorMessage}>{errorMessage}</Text>
                 <TextInput
                     style = {styles.input}
                     onChangeText = {setHeight} //quando clicar pra inserir a altura esse valor irá para a variável height
@@ -49,6 +73,7 @@ export default function Form(){
                 />
 
                 <Text style = {styles.FormLabel}>Peso</Text>
+                <Text style = {styles.errorMessage}>{errorMessage}</Text>
                 <TextInput
                     style = {styles.input}                   
                     onChangeText = {setWeight} //quando clicar pra inserir a altura esse valor irá para a variável weight
@@ -57,17 +82,22 @@ export default function Form(){
                     keyboardType = "numeric"
                 />
 
-                <TouchableOpacity
-                    style = {styles.buttonCalculator}
-                    onPress = {() => validationIMC()}
-                >
-                    <Text style = {styles.textButtonCalculator}>{textButton}</Text>
-                </TouchableOpacity>
+                <Pressable onPress = {Keyboard.dismiss}>
+                    <TouchableOpacity
+                        style = {styles.buttonCalculator}
+                        onPress = {() => validationIMC()}
+                    >
+                        
+
+                        
+                        <Text style = {styles.textButtonCalculator}>{textButton}</Text>
+                    </TouchableOpacity>
+                </Pressable>
                 
             </View>
 
             <ResultIMC messageResultIMC = {messageIMC} resultIMC = {IMC}/> 
             
-        </View>
+        </Pressable>
     );
 }
