@@ -7,6 +7,7 @@ import {
     Vibration,
     Pressable,
     Keyboard,
+    FlatList,
     } from "react-native"
 import ResultIMC from "./ResultIMC";
 import styles from "./style";
@@ -20,11 +21,14 @@ export default function Form(){
     const [IMC, setIMC] = useState(null) //Controlar o estado do resultado do imc do usuário
     const [textButton, setTextButton] = useState("Calcular") //Controlar o estado do texto do botão da mensagem
     const [errorMessage, setErrorMessage] = useState(null) //Mensagem de erro
+    const [IMCList, setIMCList] = useState([]) //IMCs calculados, e criando arrays no useState como histório dos IMCs calculados
 
     //FUNÇÃO QUE CALCULA O IMC DO USUÁRIO
     function IMCCalculator(){
         let heightFormat = height.replace("," , ".") //Se o usuário digitar a altura com vírgula "," essa função vair trocar por um ponto "."
-        return setIMC((weight/(heightFormat*heightFormat)).toFixed(2)) //Calculando o IMC do usuário
+        let totalIMC = ((weight/(heightFormat*heightFormat)).toFixed(2)) //Calculando o IMC do usuário
+        setIMCList ((arr) => [...arr, {id: new Date().getTime(), imc: totalIMC}]) //Criando um vetor, criando um id pra esse vetor com a função getTime e passando o valor do IMC para esse vetor criado
+        setIMC(totalIMC) //Atual IMC calculado
     }
 
     //VERIFICANDO SE O IMC ESTÁ VAZIO
@@ -45,59 +49,80 @@ export default function Form(){
             setMessageIMC("Seu IMC é igual a: ")
             setTextButton("Calcular novamente")
             setErrorMessage(null)
-
-            return
+        }else{
+            //Se o peso ou altura forem iguais a null
+            verificationIMC()
+            setIMC(null)
+            setTextButton("Calcular")
+            setMessageIMC("Preencha o peso e a altura")
         }
-        //Se o peso ou altura estiverem forem iguais a null
-        verificationIMC()
-        setIMC(null)
-        setTextButton("Calcular")
-        setMessageIMC("Preencha o peso e a altura")
-        
     }
 
     return(
-        <Pressable onPress = {Keyboard.dismiss} style = {styles.FormContext}>
 
-            {/* FORMULÁRIO ONDE SERÃO PREENCHIDAS AS INFORMAÇÕES DO PESO E ALTURA */}
-            <View style = {styles.Form}>
-                
-                <Text style = {styles.FormLabel}>Altura</Text>
-                <Text style = {styles.errorMessage}>{errorMessage}</Text>
-                <TextInput
+            <View style = {styles.FormContext}>
+                {IMC == null ? //Se o IMC for nulo mostra o formulário
+
+                <Pressable onPress = {Keyboard.dismiss} style = {styles.Form}>
+                    <Text style = {styles.FormLabel}>Altura</Text>
+                    <Text style = {styles.errorMessage}>{errorMessage}</Text>
+                    <TextInput
                     style = {styles.input}
                     onChangeText = {setHeight} //quando clicar pra inserir a altura esse valor irá para a variável height
                     value = {height} //o valor do textInput vai seu igual ao da variável height
                     placeholder = "Ex: 1.75"
                     keyboardType = "numeric"
-                />
+                    />
 
-                <Text style = {styles.FormLabel}>Peso</Text>
-                <Text style = {styles.errorMessage}>{errorMessage}</Text>
-                <TextInput
+                    <Text style = {styles.FormLabel}>Peso</Text>
+                    <Text style = {styles.errorMessage}>{errorMessage}</Text>
+
+                    <TextInput
                     style = {styles.input}                   
                     onChangeText = {setWeight} //quando clicar pra inserir a altura esse valor irá para a variável weight
                     value = {weight} //o valor do textInput vai seu igual ao da variável weight
                     placeholder = "Ex: 75.365"
                     keyboardType = "numeric"
-                />
-
-                <Pressable onPress = {Keyboard.dismiss}>
+                    />
+    
                     <TouchableOpacity
-                        style = {styles.buttonCalculator}
-                        onPress = {() => validationIMC()}
+                    style = {styles.buttonCalculator} 
+                    onPress = {() => validationIMC()}
                     >
-                        
-
-                        
                         <Text style = {styles.textButtonCalculator}>{textButton}</Text>
                     </TouchableOpacity>
                 </Pressable>
-                
-            </View>
 
-            <ResultIMC messageResultIMC = {messageIMC} resultIMC = {IMC}/> 
-            
-        </Pressable>
+                : //Se o IMC não for nulo mostra o valor do IMC
+
+                <View style = {styles.exibitionResultIMC}>
+                    <ResultIMC messageResultIMC = {messageIMC} resultIMC = {IMC}/> 
+
+                    <TouchableOpacity
+                    style = {styles.buttonCalculator}
+                    onPress = {() => validationIMC()}
+                    >
+                        <Text style = {styles.textButtonCalculator}>{textButton}</Text>
+                    </TouchableOpacity>
+                </View>
+                }
+                <FlatList
+                showsVerticalScrollIndicator = {false}
+                style = {styles.listIMCs}
+                data = {IMCList.reverse()}
+                renderItem = {({item}) => {
+                    return(
+                        <Text style = {styles.resultIMCItem}>
+                            <Text style = {styles.textResultItemList}>Resultado IMC = </Text>
+                            {item.imc}
+                        </Text>
+                    )
+                }}
+                keyExtractor = {(item) => {
+                    item.id
+                }}
+                />
+
+            </View>
     );
 }
